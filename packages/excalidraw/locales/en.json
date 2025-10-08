@@ -86,7 +86,7 @@
     "layers": "Layers",
     "actions": "Actions",
     "language": "Language",
-    "liveCollaboration": "Live collaboration...",
+    "liveCollaboration": "Work together live...",
     "duplicateSelection": "Duplicate",
     "untitled": "Untitled",
     "name": "Name",
@@ -305,7 +305,12 @@
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
-    "convertElementType": "Toggle shape type"
+    "convertElementType": "Toggle shape type",
+    "canvasbackground": "Canvas Background",
+    "shapes": "Shapes",
+    "emoji": "Emoji",
+    "flowchart": "Flowchart",
+    "stylepicker": "Style Picker"
   },
   "element": {
     "rectangle": "Rectangle",
@@ -373,15 +378,15 @@
   "shareDialog": {
     "or": "Or"
   },
-  "roomDialog": {
-    "desc_intro": "Invite people to collaborate on your drawing.",
-    "desc_privacy": "Don't worry, the session is end-to-end encrypted, and fully private. Not even our server can see what you draw.",
-    "button_startSession": "Start session",
-    "button_stopSession": "Stop session",
-    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
-    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "Stopping the session will disconnect you from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version.",
-    "shareTitle": "Join a live collaboration session on Excalidraw"
+  "roomDialog": {  
+  "desc_intro": "Invite others to join and work on your drawing together.",
+  "desc_privacy": "Your session is completely private and end-to-end encrypted. Even our servers can’t access your drawings.",
+  "button_startSession": "Begin session",
+  "button_stopSession": "End session",
+  "desc_inProgressIntro": "A live collaboration is currently active.",
+  "desc_shareLink": "Give this link to anyone you’d like to collaborate with:",
+  "desc_exitSession": "Leaving the session will disconnect you, but your work remains saved locally. Others in the room will still be able to continue collaborating on their version.",
+  "shareTitle": "Collaborate live on this Excalidraw project"
   },
   "errorDialog": {
     "title": "Error"
@@ -548,15 +553,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "All your data is saved locally in your browser.",
-      "center_heading_plus": "Did you want to go to the Excalidraw+ instead?",
-      "menuHint": "Export, preferences, languages, ..."
+      "center_heading": " ",
+      "center_heading_plus": " ",
+      "menuHint": " "
     },
     "defaults": {
-      "menuHint": "Export, preferences, and more...",
-      "center_heading": "Diagrams. Made. Simple.",
-      "toolbarHint": "Pick a tool & Start drawing!",
-      "helpHint": "Shortcuts & help"
+      "menuHint": " ",
+      "center_heading": " ",
+      "toolbarHint": " ",
+      "helpHint": " "
     }
   },
   "colorPicker": {

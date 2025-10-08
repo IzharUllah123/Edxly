@@ -21,11 +21,11 @@ const WelcomeScreenMenuItemContent = ({
   const device = useDevice();
   return (
     <>
-      <div className="welcome-screen-menu-item__icon">{icon}</div>
-      <div className="welcome-screen-menu-item__text">{children}</div>
-      {shortcut && !device.editor.isMobile && (
+      {/* <div className="welcome-screen-menu-item__icon">{icon}</div> */}
+      {/* <div className="welcome-screen-menu-item__text">{children}</div> */}
+      {/* {shortcut && !device.editor.isMobile && (
         <div className="welcome-screen-menu-item__shortcut">{shortcut}</div>
-      )}
+      )} */}
     </>
   );
 };
@@ -96,11 +96,7 @@ const Center = ({ children }: { children?: React.ReactNode }) => {
         {children || (
           <>
             <Logo />
-            <Heading>{t("welcomeScreen.defaults.center_heading")}</Heading>
-            <Menu>
-              <MenuItemLoadScene />
-              <MenuItemHelp />
-            </Menu>
+            {/* <Heading>{t("welcomeScreen.defaults.center_heading")}</Heading> */}
           </>
         )}
       </div>

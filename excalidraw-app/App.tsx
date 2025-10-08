@@ -19,7 +19,6 @@ import Trans from "@excalidraw/excalidraw/components/Trans";
 import {
   APP_NAME,
   EVENT,
-  THEME,
   VERSION_TIMEOUT,
   debounce,
   getVersion,
@@ -92,8 +91,7 @@ import Collab, {
   isCollaboratingAtom,
   isOfflineAtom,
 } from "./collab/Collab";
-import { AppFooter } from "./components/AppFooter";
-import { AppMainMenu } from "./components/AppMainMenu";
+
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
 import {
   ExportToExcalidrawPlus,
@@ -114,7 +112,7 @@ import {
   importUsernameFromLocalStorage,
 } from "./data/localStorage";
 
-import { loadFilesFromFirebase } from "./data/firebase";
+import { loadFilesFromSupabase } from "./data/supabase";
 import {
   LibraryIndexedDBAdapter,
   LibraryLocalStorageMigrationAdapter,
@@ -132,6 +130,7 @@ import DebugCanvas, {
   loadSavedDebugState,
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
+
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 
 import "./index.scss";
@@ -337,7 +336,7 @@ const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
 
-  const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
+  const { editorTheme } = useHandleAppTheme();
 
   const [langCode, setLangCode] = useAppLangCode();
 
@@ -411,7 +410,7 @@ const ExcalidrawWrapper = () => {
       if (collabAPI?.isCollaborating()) {
         if (data.scene.elements) {
           collabAPI
-            .fetchImageFilesFromFirebase({
+            .fetchImageFilesFromSupabase({
               elements: data.scene.elements,
               forceFetchFiles: true,
             })
@@ -434,7 +433,7 @@ const ExcalidrawWrapper = () => {
           }, [] as FileId[]) || [];
 
         if (data.isExternalScene) {
-          loadFilesFromFirebase(
+          loadFilesFromSupabase(
             `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
             data.key,
             fileIds,
@@ -732,6 +731,11 @@ const ExcalidrawWrapper = () => {
     [setShareDialogState],
   );
 
+  const onShareDialogOpen = useCallback(
+    () => setShareDialogState({ isOpen: true, type: "share" }),
+    [setShareDialogState],
+  );
+
   // browsers generally prevent infinite self-embedding, there are
   // cases where it still happens, and while we disallow self-embedding
   // by not whitelisting our own origin, this serves as an additional guard
@@ -841,19 +845,29 @@ const ExcalidrawWrapper = () => {
         handleKeyboardGlobally={true}
         autoFocus={true}
         theme={editorTheme}
+        onShareDialogOpen={onShareDialogOpen}
         renderTopRightUI={(isMobile) => {
           if (isMobile || !collabAPI || isCollabDisabled) {
             return null;
           }
+          const collaboratorsCount = excalidrawAPI
+            ? excalidrawAPI.getAppState().collaborators.size
+            : 0;
           return (
             <div className="top-right-ui">
               {collabError.message && <CollabError collabError={collabError} />}
+              {isCollaborating && collaboratorsCount > 0 && (
+                <div className="collaborator-count">
+                  Shared with {collaboratorsCount === 1 ? "1 person" : `${collaboratorsCount} people`}
+                </div>
+              )}
               <LiveCollaborationTrigger
                 isCollaborating={isCollaborating}
-                onSelect={() =>
-                  setShareDialogState({ isOpen: true, type: "share" })
-                }
+                onSelect={() => onShareDialogOpen()}
               />
+              <div className="share">
+                <span className="space">SHARE</span>
+              </div>
             </div>
           );
         }}
@@ -864,14 +878,6 @@ const ExcalidrawWrapper = () => {
           }
         }}
       >
-        <AppMainMenu
-          onCollabDialogOpen={onCollabDialogOpen}
-          isCollaborating={isCollaborating}
-          isCollabEnabled={!isCollabDisabled}
-          theme={appTheme}
-          setTheme={(theme) => setAppTheme(theme)}
-          refresh={() => forceRefresh((prev) => !prev)}
-        />
         <AppWelcomeScreen
           onCollabDialogOpen={onCollabDialogOpen}
           isCollabEnabled={!isCollabDisabled}
@@ -896,7 +902,6 @@ const ExcalidrawWrapper = () => {
             </OverwriteConfirmDialog.Action>
           )}
         </OverwriteConfirmDialog>
-        <AppFooter onChange={() => excalidrawAPI?.refresh()} />
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
 
         <TTDDialogTrigger />
@@ -1106,9 +1111,7 @@ const ExcalidrawWrapper = () => {
             {
               ...CommandPalette.defaultItems.toggleTheme,
               perform: () => {
-                setAppTheme(
-                  editorTheme === THEME.DARK ? THEME.LIGHT : THEME.DARK,
-                );
+                // Theme toggling handled by default Excalidraw behavior
               },
             },
             {

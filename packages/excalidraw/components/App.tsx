@@ -4555,17 +4555,18 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.selectedElementsAreBeingDragged
       ) {
         const shape = findShapeByKey(event.key, this);
-        if (shape) {
-          if (this.state.activeTool.type !== shape) {
+        if (shape && (shape.value === "text" || shape.value === "selection" || shape.value === "lasso" || shape.value === "freedraw" || shape.value === "eraser" || shape.value === "hand" || shape.value === "image")) {
+          const toolType = shape.value as ToolType;
+          if (this.state.activeTool.type !== toolType) {
             trackEvent(
               "toolbar",
-              shape,
+              toolType,
               `keyboard (${
                 this.device.editor.isMobile ? "mobile" : "desktop"
               })`,
             );
           }
-          if (shape === "arrow" && this.state.activeTool.type === "arrow") {
+          if (toolType === "arrow" && this.state.activeTool.type === "arrow") {
             this.setState((prevState) => ({
               currentItemArrowType:
                 prevState.currentItemArrowType === ARROW_TYPE.sharp
@@ -4575,7 +4576,7 @@ class App extends React.Component<AppProps, AppState> {
                   : ARROW_TYPE.sharp,
             }));
           }
-          this.setActiveTool({ type: shape });
+          this.setActiveTool({ type: toolType });
           event.stopPropagation();
         } else if (event.key === KEYS.Q) {
           this.toggleLock("keyboard");
@@ -6814,12 +6815,14 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.y,
       );
     } else if (
-      this.state.activeTool.type !== "eraser" &&
-      this.state.activeTool.type !== "hand" &&
-      this.state.activeTool.type !== "image"
+      this.state.activeTool.type === "selection" ||
+      this.state.activeTool.type === "rectangle" ||
+      this.state.activeTool.type === "diamond" ||
+      this.state.activeTool.type === "ellipse" ||
+      this.state.activeTool.type === "embeddable"
     ) {
       this.createGenericElementOnPointerDown(
-        this.state.activeTool.type,
+        this.state.activeTool.type as "selection" | "rectangle" | "diamond" | "ellipse" | "embeddable",
         pointerDownState,
       );
     }
@@ -11389,45 +11392,45 @@ class App extends React.Component<AppProps, AppState> {
 // -----------------------------------------------------------------------------
 // TEST HOOKS
 // -----------------------------------------------------------------------------
-declare global {
-  interface Window {
-    h: {
-      scene: Scene;
-      elements: readonly ExcalidrawElement[];
-      state: AppState;
-      setState: React.Component<any, AppState>["setState"];
-      app: InstanceType<typeof App>;
-      history: History;
-      store: Store;
-    };
-  }
-}
+// declare global {
+//   interface Window {
+//     h: {
+//       scene: Scene;
+//       elements: readonly ExcalidrawElement[];
+//       state: AppState;
+//       setState: React.Component<any, AppState>["setState"];
+//       app: InstanceType<typeof App>;
+//       history: History;
+//       store: Store;
+//     };
+//   }
+// }
 
-export const createTestHook = () => {
-  if (isTestEnv() || isDevEnv()) {
-    window.h = window.h || ({} as Window["h"]);
+// export const createTestHook = () => {
+//   if (isTestEnv() || isDevEnv()) {
+//     window.h = window.h || ({} as Window["h"]);
 
-    Object.defineProperties(window.h, {
-      elements: {
-        configurable: true,
-        get() {
-          return this.app?.scene.getElementsIncludingDeleted();
-        },
-        set(elements: ExcalidrawElement[]) {
-          return this.app?.scene.replaceAllElements(
-            syncInvalidIndices(elements),
-          );
-        },
-      },
-      scene: {
-        configurable: true,
-        get() {
-          return this.app?.scene;
-        },
-      },
-    });
-  }
-};
+//     Object.defineProperties(window.h, {
+//       elements: {
+//         configurable: true,
+//         get() {
+//           return this.app?.scene.getElementsIncludingDeleted();
+//         },
+//         set(elements: ExcalidrawElement[]) {
+//           return this.app?.scene.replaceAllElements(
+//             syncInvalidIndices(elements),
+//           );
+//         },
+//       },
+//       scene: {
+//         configurable: true,
+//         get() {
+//           return this.app?.scene;
+//         },
+//       },
+//     });
+//   }
+// };
 
-createTestHook();
+// createTestHook();
 export default App;

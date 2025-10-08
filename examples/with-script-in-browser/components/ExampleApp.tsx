@@ -335,9 +335,9 @@ export default function ExampleApp({
         ]),
         null,
       ),
-      appState: {
-        viewBackgroundColor: "#edf2ff",
-      },
+      // appState: {
+      //   viewBackgroundColor: "#edf2ff",
+      // },
     };
     excalidrawAPI?.updateScene(sceneData);
   };

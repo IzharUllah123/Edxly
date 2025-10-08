@@ -35,22 +35,54 @@ export const ContextMenu = React.memo(
     const appState = useExcalidrawAppState();
     const elements = useExcalidrawElements();
 
-    const filteredItems = items.reduce((acc: ContextMenuItem[], item) => {
-      if (
-        item &&
-        (item === CONTEXT_MENU_SEPARATOR ||
-          !item.predicate ||
-          item.predicate(
-            elements,
-            appState,
-            actionManager.app.props,
-            actionManager.app,
-          ))
-      ) {
-        acc.push(item);
-      }
-      return acc;
-    }, []);
+    // const filteredItems = items.reduce((acc: ContextMenuItem[], item) => {
+    //   if (
+    //     item &&
+    //     (item === CONTEXT_MENU_SEPARATOR ||
+    //       !item.predicate ||
+    //       item.predicate(
+    //         elements,
+    //         appState,
+    //         actionManager.app.props,
+    //         actionManager.app,
+    //       ))
+    //   ) {
+    //     acc.push(item);
+    //   }
+    //   return acc;
+    // }, []);
+
+
+    // ContextMenu.tsx (or wherever you filter items)
+const HIDDEN_ACTIONS = [
+  "copyAsSvg",
+  "copyAsPng",
+  "copyStyles",
+  "pasteStyles",
+  "addToLibrary",
+];
+
+const filteredItems = items.reduce((acc: ContextMenuItem[], item) => {
+  // hide any unwanted actions by name
+  if (item && (item as Action).name && HIDDEN_ACTIONS.includes((item as Action).name)) {
+    return acc;
+  }
+
+  if (
+    item &&
+    (item === CONTEXT_MENU_SEPARATOR ||
+      !item.predicate ||
+      item.predicate(
+        elements,
+        appState,
+        actionManager.app.props,
+        actionManager.app,
+      ))
+  ) {
+    acc.push(item);
+  }
+  return acc;
+}, []);
 
     return (
       <Popover

@@ -140,6 +140,57 @@ export const PinIcon = createIcon(
   tablerIconProps,
 );
 
+
+// Emoji icon
+
+// export const EmojiIcon = createIcon(
+//   <g
+//     strokeWidth="1.5"
+//     stroke="currentColor"
+//     fill="none"
+//   >
+//     {/* Outer circle (face outline) */}
+//     <circle cx="12" cy="12" r="9" />
+
+//     {/* Eyes */}
+//     <circle cx="9" cy="10" r="1" fill="currentColor" />
+//     <circle cx="15" cy="10" r="1" fill="currentColor" />
+
+//     {/* Smile */}
+//     <path
+//       d="M8 15c1.5 1.5 4.5 1.5 6 0"
+//       strokeLinecap="round"
+//     />
+//   </g>,
+//   tablerIconProps,
+// );
+
+export const EmojiIcon = createIcon(
+  <g
+    strokeWidth="1.5"
+    stroke="#000"        // Force black stroke
+    fill="none"
+  >
+    {/* Outer circle (face outline) */}
+    <circle cx="12" cy="12" r="9" stroke="#000" fill="none" />
+
+    {/* Eyes */}
+    <circle cx="9" cy="10" r="1" fill="#000" />
+    <circle cx="15" cy="10" r="1" fill="#000" />
+
+    {/* Smile */}
+    <path
+      d="M8 15c1.5 1.5 4.5 1.5 6 0"
+      stroke="#000"
+      strokeLinecap="round"
+    />
+  </g>,
+  tablerIconProps
+);
+
+
+
+
 export const polygonIcon = createIcon(
   <g strokeWidth={1.25}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -217,7 +268,7 @@ export const LockedIconFilled = createIcon(
 // custom
 export const WelcomeScreenMenuArrow = createIcon(
   <>
-    <path
+    {/* <path
       d="M38.5 83.5c-14-2-17.833-10.473-21-22.5C14.333 48.984 12 22 12 12.5"
       stroke="currentColor"
       strokeWidth={2}
@@ -234,7 +285,7 @@ export const WelcomeScreenMenuArrow = createIcon(
       stroke="currentColor"
       strokeWidth={2}
       strokeLinecap="round"
-    />
+    /> */}
   </>,
   { width: 41, height: 94, fill: "none" },
 );
@@ -267,7 +318,7 @@ export const WelcomeScreenHelpArrow = createIcon(
 // custom
 export const WelcomeScreenTopToolbarArrow = createIcon(
   <>
-    <path
+    {/* <path
       d="M1 77c14-2 31.833-11.973 35-24 3.167-12.016-6-35-9.5-43.5"
       stroke="currentColor"
       strokeWidth={2}
@@ -284,7 +335,7 @@ export const WelcomeScreenTopToolbarArrow = createIcon(
       stroke="currentColor"
       strokeWidth={2}
       strokeLinecap="round"
-    />
+    /> */}
   </>,
   { width: 38, height: 78, fill: "none" },
 );
@@ -397,14 +448,13 @@ export const FreedrawIcon = createIcon(
 // tabler-icons: typography
 export const TextIcon = createIcon(
   <g strokeWidth="1.5">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <line x1="4" y1="20" x2="7" y2="20" />
-    <line x1="14" y1="20" x2="21" y2="20" />
-    <line x1="6.9" y1="15" x2="13.8" y2="15" />
-    <line x1="10.2" y1="6.3" x2="16" y2="20" />
-    <polyline points="5 20 11 4 13 4 20 20"></polyline>
+     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+ 
+  <line x1="4" y1="4" x2="20" y2="4" />
+
+  <line x1="12" y1="4" x2="12" y2="20" />
   </g>,
-  tablerIconProps,
+    tablerIconProps,
 );
 
 export const TextSizeIcon = createIcon(
@@ -2337,4 +2387,18 @@ export const strokeIcon = createIcon(
     <rect x="6" y="6" width="12" height="12" fill="none" />
   </g>,
   tablerIconProps,
+);
+
+// custom
+export const shapesIcon = createIcon(
+  <g strokeWidth="1.25">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M4.167 6h3.532a.67 .67 0 0 1 .67 .670v.76a.67 .67 0 0 1 -.67 .67H4.167V6z"></path>
+    <path d="M10.5 9.6 8.25 7.35l2.25-2.25 2.25 2.25L10.5 9.6z"></path>
+    <circle cx="16.5" cy="7.5" r="2.25"></circle>
+    <path d="M6 12h12"></path>
+    <path d="M4 16h3"></path>
+    <path d="M4 18h3"></path>
+  </g>,
+  modifiedTablerIconProps,
 );

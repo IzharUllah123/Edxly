@@ -8,6 +8,7 @@ interface Window {
   gtag: Function;
   sa_event: Function;
   fathom: { trackEvent: Function };
+    h?: any; 
 }
 
 interface CanvasRenderingContext2D {

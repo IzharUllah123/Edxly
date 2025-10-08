@@ -465,7 +465,7 @@ describe("element binding", () => {
       mouse.up(0, 0);
 
       expect(window.h.elements.length).toBe(6);
-      window.h.elements.forEach((element) => {
+      window.h.elements.forEach((element: any) => {
         if (isLinearElement(element)) {
           expect(element.startBinding).not.toBe(null);
           expect(element.endBinding).not.toBe(null);

@@ -197,12 +197,8 @@ describe("<Excalidraw/>", () => {
         expect(queryByTestId(container, "save-button")).toBeNull();
       });
 
-      it("should hide the canvas background picker when changeViewBackgroundColor is false", async () => {
-        const { container } = await render(
-          <Excalidraw
-            UIOptions={{ canvasActions: { changeViewBackgroundColor: false } }}
-          />,
-        );
+      it("should not render the canvas background picker by default", async () => {
+        const { container } = await render(<Excalidraw />);
         //open menu
         toggleMenu(container);
         expect(queryByTestId(container, "canvas-background-label")).toBeNull();

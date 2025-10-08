@@ -9,7 +9,41 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    margin-left: 8px;
   }
+
+  .collaborator-count {
+    // background-color: var(--color-primary);
+    background-color: #064e3c;
+    color: rgb(192, 11, 11);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--border-radius-md);
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-right: 0.5rem;
+    white-space: nowrap;
+  }
+
+.share{
+// display: flex;
+   // height: 60px;
+  // background: linear-gradient(90deg, #e67417, #d4c68e);
+  color: white;
+  font-size: 17px;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+  margin-left: 4px;
+/* Optional: style the text */
+margin-top: auto;
+margin-bottom: auto;
+
+
+}
+.space{
+  letter-spacing: 0.5px;
+  padding: 3px;
+}
+
 
   .footer-center {
     justify-content: flex-end;
@@ -114,4 +148,26 @@
       color: black !important;
     }
   }
+}
+
+/* Hide footer and main menu completely */
+.excalidraw {
+  .footer,
+  .footer-center,
+  .excalidraw-footer,
+  .main-menu,
+  .app-main-menu {
+    display: none !important;
+  }
+}
+
+/* Hide main menu container */
+.main-menu-container,
+.app-main-menu-container {
+  display: none !important;
+}
+
+/* Hide any footer elements globally */
+footer {
+  display: none !important;
 }

@@ -74,7 +74,7 @@ describe("adding elements to frames", () => {
   }
 
   function expectEqualIds(expected: ExcalidrawElement[]) {
-    expect(h.elements.map((x) => x.id)).toEqual(expected.map((x) => x.id));
+    expect(h.elements.map((x: any) => x.id)).toEqual(expected.map((x: any) => x.id));
   }
 
   let frame: ExcalidrawElement;

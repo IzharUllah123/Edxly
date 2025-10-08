@@ -53,8 +53,8 @@ describe("flow chart creation", () => {
     Keyboard.keyUp(KEYS.CTRL_OR_CMD);
 
     expect(h.elements.length).toBe(5);
-    expect(h.elements.filter((el) => el.type === "rectangle").length).toBe(3);
-    expect(h.elements.filter((el) => el.type === "arrow").length).toBe(2);
+    expect(h.elements.filter((el: any) => el.type === "rectangle").length).toBe(3);
+    expect(h.elements.filter((el: any) => el.type === "arrow").length).toBe(2);
   });
 
   it("when directions are changed, only the last same directions will apply", () => {
@@ -73,8 +73,8 @@ describe("flow chart creation", () => {
     Keyboard.keyUp(KEYS.CTRL_OR_CMD);
 
     expect(h.elements.length).toBe(7);
-    expect(h.elements.filter((el) => el.type === "rectangle").length).toBe(4);
-    expect(h.elements.filter((el) => el.type === "arrow").length).toBe(3);
+    expect(h.elements.filter((el: any) => el.type === "rectangle").length).toBe(4);
+    expect(h.elements.filter((el: any) => el.type === "arrow").length).toBe(3);
   });
 
   it("when escaped, no nodes will be created", () => {
@@ -100,11 +100,11 @@ describe("flow chart creation", () => {
     Keyboard.keyUp(KEYS.CTRL_OR_CMD);
 
     expect(h.elements.length).toBe(3);
-    expect(h.elements.filter((el) => el.type === "rectangle").length).toBe(2);
-    expect(h.elements.filter((el) => el.type === "arrow").length).toBe(1);
+    expect(h.elements.filter((el: any) => el.type === "rectangle").length).toBe(2);
+    expect(h.elements.filter((el: any) => el.type === "arrow").length).toBe(1);
 
     const firstChildNode = h.elements.filter(
-      (el) => el.type === "rectangle" && el.id !== initialNode.id,
+      (el: any) => el.type === "rectangle" && el.id !== initialNode.id,
     )[0];
     expect(firstChildNode).not.toBe(null);
     expect(firstChildNode.id).toBe(Object.keys(h.state.selectedElementIds)[0]);
@@ -117,11 +117,11 @@ describe("flow chart creation", () => {
     Keyboard.keyUp(KEYS.CTRL_OR_CMD);
 
     expect(h.elements.length).toBe(5);
-    expect(h.elements.filter((el) => el.type === "rectangle").length).toBe(3);
-    expect(h.elements.filter((el) => el.type === "arrow").length).toBe(2);
+    expect(h.elements.filter((el: any) => el.type === "rectangle").length).toBe(3);
+    expect(h.elements.filter((el: any) => el.type === "arrow").length).toBe(2);
 
     const secondChildNode = h.elements.filter(
-      (el) =>
+      (el: any) =>
         el.type === "rectangle" &&
         el.id !== initialNode.id &&
         el.id !== firstChildNode.id,
@@ -137,11 +137,11 @@ describe("flow chart creation", () => {
     Keyboard.keyUp(KEYS.CTRL_OR_CMD);
 
     expect(h.elements.length).toBe(7);
-    expect(h.elements.filter((el) => el.type === "rectangle").length).toBe(4);
-    expect(h.elements.filter((el) => el.type === "arrow").length).toBe(3);
+    expect(h.elements.filter((el: any) => el.type === "rectangle").length).toBe(4);
+    expect(h.elements.filter((el: any) => el.type === "arrow").length).toBe(3);
 
     const thirdChildNode = h.elements.filter(
-      (el) =>
+      (el: any) =>
         el.type === "rectangle" &&
         el.id !== initialNode.id &&
         el.id !== firstChildNode.id &&
@@ -192,8 +192,8 @@ describe("flow chart navigation", () => {
     });
     Keyboard.keyUp(KEYS.CTRL_OR_CMD);
 
-    expect(h.elements.filter((el) => el.type === "rectangle").length).toBe(5);
-    expect(h.elements.filter((el) => el.type === "arrow").length).toBe(4);
+    expect(h.elements.filter((el: any) => el.type === "rectangle").length).toBe(5);
+    expect(h.elements.filter((el: any) => el.type === "arrow").length).toBe(4);
 
     // all the way to the left, gets us to the first node
     Keyboard.withModifierKeys({ alt: true }, () => {

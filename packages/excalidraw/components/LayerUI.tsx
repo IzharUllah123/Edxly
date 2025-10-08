@@ -5,7 +5,6 @@ import {
   CLASSES,
   DEFAULT_SIDEBAR,
   MQ_MIN_WIDTH_DESKTOP,
-  TOOL_TYPE,
   arrayToMap,
   capitalizeString,
   isShallowEqual,
@@ -56,13 +55,13 @@ import ElementLinkDialog from "./ElementLinkDialog";
 import { ErrorDialog } from "./ErrorDialog";
 import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
 import { FixedSideContainer } from "./FixedSideContainer";
-import { HandButton } from "./HandButton";
+
 import { HelpDialog } from "./HelpDialog";
 import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
-import { LaserPointerButton } from "./LaserPointerButton";
+
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
@@ -100,6 +99,7 @@ interface LayerUIProps {
   app: AppClassProperties;
   isCollaborating: boolean;
   generateLinkForSelection?: AppProps["generateLinkForSelection"];
+  onShareDialogOpen?: () => void;
 }
 
 const DefaultMainMenu: React.FC<{
@@ -116,15 +116,9 @@ const DefaultMainMenu: React.FC<{
         <MainMenu.DefaultItems.SaveAsImage />
       )}
       <MainMenu.DefaultItems.SearchMenu />
-      <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
-      <MainMenu.Group title="Excalidraw links">
-        <MainMenu.DefaultItems.Socials />
-      </MainMenu.Group>
-      <MainMenu.Separator />
       <MainMenu.DefaultItems.ToggleTheme />
-      <MainMenu.DefaultItems.ChangeCanvasBackground />
     </MainMenu>
   );
 };
@@ -158,6 +152,7 @@ const LayerUI = ({
   app,
   isCollaborating,
   generateLinkForSelection,
+  onShareDialogOpen,
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
@@ -284,10 +279,7 @@ const LayerUI = ({
   };
 
   const renderFixedSideContainer = () => {
-    const shouldRenderSelectedShapeActions = showSelectedShapeActions(
-      appState,
-      elements,
-    );
+    const shouldRenderSelectedShapeActions = false; // Remove the left panel as requested
 
     const shouldShowStats =
       appState.stats.open &&
@@ -350,49 +342,35 @@ const LayerUI = ({
                               title={t("toolBar.penMode")}
                               penDetected={appState.penDetected}
                             />
-                            <LockButton
+                            {/* <LockButton
                               checked={appState.activeTool.locked}
                               onChange={onLockToggle}
                               title={t("toolBar.lock")}
-                            />
+                            /> */}
+
+                            {/* <span>EDXLY</span> */}
+
+                            <div className="txt">
+                              <span className="edxly">EDXLY</span>
+                            </div>
 
                             <div className="App-toolbar__divider" />
-
-                            <HandButton
-                              checked={isHandToolActive(appState)}
-                              onChange={() => onHandToolToggle()}
-                              title={t("toolBar.hand")}
-                              isMobile
-                            />
 
                             <ShapesSwitcher
                               appState={appState}
                               activeTool={appState.activeTool}
                               UIOptions={UIOptions}
                               app={app}
+                              elementsMap={app.scene.getNonDeletedElementsMap()}
+                              setAppState={setAppState}
+                              onChange={setAppState}
+                              renderAction={actionManager.renderAction}
+                              isCollaborating={isCollaborating}
+                              onShareDialogOpen={onShareDialogOpen}
+                              renderTopRightUI={renderTopRightUI}
                             />
                           </Stack.Row>
                         </Island>
-                        {isCollaborating && (
-                          <Island
-                            style={{
-                              marginLeft: spacing.collabMarginLeft,
-                              alignSelf: "center",
-                              height: "fit-content",
-                            }}
-                          >
-                            <LaserPointerButton
-                              title={t("toolBar.laser")}
-                              checked={
-                                appState.activeTool.type === TOOL_TYPE.laser
-                              }
-                              onChange={() =>
-                                app.setActiveTool({ type: TOOL_TYPE.laser })
-                              }
-                              isMobile
-                            />
-                          </Island>
-                        )}
                       </Stack.Row>
                     </Stack.Col>
                   </div>
@@ -415,7 +393,6 @@ const LayerUI = ({
                 userToFollow={appState.userToFollow?.socketId || null}
               />
             )}
-            {renderTopRightUI?.(device.editor.isMobile, appState)}
             {!appState.viewModeEnabled &&
               appState.openDialog?.name !== "elementLinkSelector" &&
               // hide button when sidebar docked
@@ -465,7 +442,8 @@ const LayerUI = ({
           tunneled away. We only render tunneled components that actually
         have defaults when host do not render anything. */}
       <DefaultMainMenu UIOptions={UIOptions} />
-      <DefaultSidebar.Trigger
+      {/* Library button removed from top right UI */}
+      {/* <DefaultSidebar.Trigger
         __fallback
         icon={LibraryIcon}
         title={capitalizeString(t("toolBar.library"))}
@@ -483,7 +461,7 @@ const LayerUI = ({
         {appState.stylesPanelMode === "full" &&
           appState.width >= MQ_MIN_WIDTH_DESKTOP &&
           t("toolBar.library")}
-      </DefaultSidebar.Trigger>
+      </DefaultSidebar.Trigger> */}
       <DefaultOverwriteConfirmDialog />
       {appState.openDialog?.name === "ttd" && <TTDDialog __fallback />}
       {/* ------------------------------------------------------------------ */}

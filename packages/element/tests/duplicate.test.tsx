@@ -9,7 +9,10 @@ import {
 
 import { Excalidraw, mutateElement } from "@excalidraw/excalidraw";
 
-import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions";
+import {
+  actionDuplicateSelection,
+  actionSelectAll,
+} from "@excalidraw/excalidraw/actions";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
@@ -429,7 +432,7 @@ describe("group-related duplication", () => {
     API.setSelectedElements([rectangle2], "group1");
 
     act(() => {
-      h.app.actionManager.executeAction(actionDuplicateSelection);
+      h.app.actionManager.executeAction(actionDuplicateSelection as any);
     });
 
     assertElements(h.elements, [
@@ -541,7 +544,7 @@ describe("duplication z-order", () => {
     API.setSelectedElements([rectangle1]);
 
     act(() => {
-      h.app.actionManager.executeAction(actionDuplicateSelection);
+      h.app.actionManager.executeAction(actionDuplicateSelection as any);
     });
 
     assertElements(h.elements, [
@@ -573,7 +576,7 @@ describe("duplication z-order", () => {
     API.setSelectedElements([rectangle3]);
 
     act(() => {
-      h.app.actionManager.executeAction(actionDuplicateSelection);
+      h.app.actionManager.executeAction(actionDuplicateSelection as any);
     });
 
     assertElements(h.elements, [

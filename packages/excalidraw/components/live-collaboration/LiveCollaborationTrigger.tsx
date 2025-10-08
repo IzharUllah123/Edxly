@@ -37,8 +37,11 @@ const LiveCollaborationTrigger = ({
           {appState.collaborators.size}
         </div>
       )}
+      
     </Button>
+  
   );
+  
 };
 
 export default LiveCollaborationTrigger;

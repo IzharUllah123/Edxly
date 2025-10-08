@@ -208,3 +208,110 @@
   --button-hover-bg: #363541;
   --button-bg: var(--color-surface-high);
 }
+
+// for panel
+
+.style-picker-popover {
+  &.excalidraw {
+    // background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+//  background: linear-gradient(135deg, #7ee087 0%, #d4c68e 100%);
+background: linear-gradient(
+  135deg,
+  #7ee087 0%,
+  #4a90e2 50%,   /* blue at midpoint */
+  #d4c68e 100%
+);
+
+   
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    
+    /* Smooth animations */
+    animation: fadeInUp 0.2s ease-out;
+    
+    /* Custom dimensions */
+    min-width: 200px !important;  /* Adjust width */
+    max-width: 400px !important;  /* Adjust max width */
+    max-height: 500px !important; /* Adjust height */
+    min-height: 300px;            /* Adjust min height */
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Customize inner container */
+.style-picker-container {
+  padding: 24px 20px;  /* Adjust padding */
+  background: rgba(255, 255, 255, 0.1);  /* Add semi-transparent overlay */
+  border-radius: 10px;
+
+    /* Add scroll behavior */
+  max-height: 400px;           /* Limit container height */
+  overflow-y: auto;            /* Enable vertical scrolling */
+  scrollbar-width: thin;       /* Firefox */
+  scrollbar-color: #666 #222;  /* Firefox colors */
+
+
+/* Optional: Custom scrollbar for WebKit browsers (Chrome, Edge, Safari) */
+.style-picker-container::-webkit-scrollbar {
+  width: 8px;
+}
+}
+
+/* Customize section styling */
+.style-picker-section {
+  margin-bottom: 20px; /* Adjust spacing between sections */
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.style-picker-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.style-properties {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Adjust gap between controls */
+}
+
+
+/* Fade and scale animation */
+@keyframes smoothFadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(8px) scale(0.98); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+/* Elastic entrance */
+@keyframes elasticZoom {
+  0% { transform: scale(0.5); opacity: 0; }
+  40% { transform: scale(1.05); }
+  70% { transform: scale(0.98); }
+  100% { transform: scale(1); opacity: 1; }
+}

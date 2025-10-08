@@ -154,7 +154,12 @@ export type ToolType =
   | "frame"
   | "magicframe"
   | "embeddable"
-  | "laser";
+  | "laser"
+  | "shapes"
+  | "stylepicker"
+  | "canvasbackground"
+  | "emoji"
+  | "flowchart";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
@@ -625,6 +630,7 @@ export interface ExcalidrawProps {
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
+  onShareDialogOpen?: () => void;
 }
 
 export type SceneData = {

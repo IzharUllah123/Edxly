@@ -335,9 +335,6 @@ export default function LibraryMenuItems({
         {showBtn && (
           <LibraryMenuControlButtons
             style={{ padding: "16px 0", width: "100%" }}
-            id={id}
-            libraryReturnUrl={libraryReturnUrl}
-            theme={theme}
           >
             <LibraryDropdownMenu
               selectedItems={selectedItems}

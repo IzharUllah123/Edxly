@@ -1,6 +1,10 @@
 import clsx from "clsx";
 import { useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
+import "./toolbar.scss";
+import { newTextElement } from "@excalidraw/element";
+import FlowchartDropdown from "./FlowchartDropdown"; // adjust the relative path
+
 
 import {
   CLASSES,
@@ -52,7 +56,10 @@ import { getFormValue } from "../actions/actionProperties";
 
 import { useTextEditorFocus } from "../hooks/useTextEditorFocus";
 
-import { getToolbarTools } from "./shapes";
+import { getToolbarTools} from "./shapes";
+import { StylePicker } from "./StylePicker";
+import { ColorPicker } from "./ColorPicker/ColorPicker";
+import { DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE, DEFAULT_ELEMENT_BACKGROUND_PICKS } from "@excalidraw/common";
 
 import "./Actions.scss";
 
@@ -62,20 +69,20 @@ import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { PropertiesPopover } from "./PropertiesPopover";
+import LiveCollaborationTrigger from "./live-collaboration/LiveCollaborationTrigger";
 import {
-  EmbedIcon,
-  extraToolsIcon,
-  frameToolIcon,
-  mermaidLogoIcon,
-  laserPointerToolIcon,
-  MagicIcon,
-  LassoIcon,
+  
   sharpArrowIcon,
   roundArrowIcon,
   elbowArrowIcon,
   TextSizeIcon,
   adjustmentsIcon,
   DotsHorizontalIcon,
+  RectangleIcon,
+  DiamondIcon,
+  EllipseIcon,
+  ArrowIcon,
+  LineIcon,
 } from "./icons";
 
 import type {
@@ -92,6 +99,9 @@ const PROPERTIES_CLASSES = clsx([
   CLASSES.SHAPE_ACTIONS_THEME_SCOPE,
   "properties-content",
 ]);
+
+
+
 
 export const canChangeStrokeColor = (
   appState: UIAppState,
@@ -114,17 +124,49 @@ export const canChangeStrokeColor = (
       commonSelectedType !== "magicframe") ||
     targetElements.some((element) => hasStrokeColor(element.type))
   );
+
+  
+
+  
+
+
+
+
 };
+
+
+
+
+// Replace these functions in your Actions.tsx file
 
 export const canChangeBackgroundColor = (
   appState: UIAppState,
   targetElements: ExcalidrawElement[],
 ) => {
+  // Always show fill color for all toolbar shapes
+  const toolbarShapes = ["rectangle", "ellipse", "diamond", "arrow", "line", "freedraw", "text"];
+  
   return (
+    toolbarShapes.includes(appState.activeTool.type) ||
+    targetElements.some((element) => toolbarShapes.includes(element.type)) ||
     hasBackground(appState.activeTool.type) ||
     targetElements.some((element) => hasBackground(element.type))
   );
 };
+
+// Add this helper function with a different name to avoid conflict
+export const hasLinearElements = (
+  appState: UIAppState,
+  targetElements: ExcalidrawElement[],
+) => {
+  const linearTypes = ["arrow", "line", "freedraw"];
+  
+  return (
+    linearTypes.includes(appState.activeTool.type) ||
+    targetElements.some((element) => linearTypes.includes(element.type))
+  );
+};
+
 
 export const SelectedShapeActions = ({
   appState,
@@ -399,6 +441,7 @@ export const CompactShapeActions = ({
               <button
                 type="button"
                 className="compact-action-button properties-trigger"
+               
                 title={t("labels.stroke")}
                 onClick={(e) => {
                   e.preventDefault();
@@ -736,32 +779,409 @@ export const CompactShapeActions = ({
   );
 };
 
+// Dynamic Color Box that shows the last selected color
+const DynamicColorBox = ({
+  appState,
+  lastSelectedColorSource,
+}: {
+  appState: UIAppState;
+  lastSelectedColorSource: 'fill' | 'stroke';
+}) => {
+  const currentColor = lastSelectedColorSource === 'fill'
+    ? appState.currentItemBackgroundColor || "#d4a574"
+    : appState.currentItemStrokeColor || "#000000";
+
+  return (
+    <div
+      className="ColorDisplayBox"
+      title="Current Color"
+      aria-label="Current Color"
+      style={{
+        width: "28px",
+        height: "28px",
+        border: "2px solid #ccc",
+        borderRadius: "4px",
+        backgroundColor: currentColor,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "default",
+        userSelect: "none",
+      }}
+    >
+      {/* Small transparent indicator for transparent colors */}
+      {(currentColor === "transparent" || currentColor === "#ffffff00") && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%) rotate(45deg)",
+            width: "16px",
+            height: "2px",
+            backgroundColor: "#666",
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+// F and S Color Buttons (Fill and Stroke)
+const ColorButtons = ({
+  appState,
+  onChange,
+  container,
+  elementsMap,
+  renderAction,
+  setLastSelectedColorSource,
+}: {
+  appState: UIAppState;
+  onChange: (updates: Partial<UIAppState>) => void;
+  container: HTMLElement;
+  elementsMap: NonDeletedElementsMap;
+  renderAction: any;
+  setLastSelectedColorSource: React.Dispatch<React.SetStateAction<'fill' | 'stroke'>>;
+}) => {
+  const [fillOpen, setFillOpen] = useState(false);
+  const [strokeOpen, setStrokeOpen] = useState(false);
+  const targetElements = getTargetElements(elementsMap, appState);
+  const { currentItemBackgroundColor } = appState;
+
+  // Check if we're dealing with linear elements (arrows, lines)
+  const linearTypes = ["arrow", "line", "freedraw"];
+  const isLinearElementType = linearTypes.includes(appState.activeTool.type) ||
+    targetElements.some((element) => linearTypes.includes(element.type));
+
+  // Display the appropriate color based on element type for preview
+  const displayFillColor = targetElements.length === 1
+    ? targetElements[0]?.backgroundColor || currentItemBackgroundColor || "#d4a574"
+    : currentItemBackgroundColor || "#d4a574";
+
+  const displayStrokeColor = targetElements.length === 1
+    ? targetElements[0]?.strokeColor || appState.currentItemStrokeColor || "#000000"
+    : appState.currentItemStrokeColor || "#000000";
+
+  const fillColorIsTransparent = displayFillColor === "transparent";
+  const strokeColorIsTransparent = displayStrokeColor === "transparent";
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+      {/* F Button (Fill Color) */}
+      <Popover.Root open={fillOpen} onOpenChange={setFillOpen}>
+        <Popover.Trigger asChild>
+          <button
+            type="button"
+            className="ColorButton"
+            title="Fill Color (F)"
+            aria-label="Fill Color"
+            style={{
+              width: "20px",
+              height: "16px",
+              fontSize: "10px",
+              fontWeight: "bold",
+              color: "#333",
+              backgroundColor: "#e8f4f8", // Light blue background for Fill button
+              border: "1px solid #ccc",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              padding: 0,
+            }}
+          >
+            F
+          </button>
+        </Popover.Trigger>
+        <Popover.Content
+          className="style-picker-popover excalidraw"
+          style={{
+            minWidth: "200px",
+            zIndex: 1200,
+          }}
+          align="start"
+          side="bottom"
+          avoidCollisions={true}
+          collisionPadding={10}
+        >
+          <div className="style-picker-container">
+            <div className="style-picker-section">
+              <label className="style-picker-label">Fill Color</label>
+              <div className="color-controls">
+                <ColorPicker
+                  type="elementBackground"
+                  color={
+                    targetElements.length === 1
+                      ? targetElements[0]?.backgroundColor ?? null
+                      : null
+                  }
+                  onChange={(color) => {
+                    onChange({
+                      currentItemBackgroundColor: color,
+                    });
+                    setLastSelectedColorSource('fill');
+                    setFillOpen(false);
+                  }}
+                  label="Fill Color"
+                  elements={targetElements}
+                  appState={appState as any}
+                  updateData={(data) => {
+                    if (data.openPopup !== undefined) {
+                      onChange({ openPopup: data.openPopup } as any);
+                    }
+                  }}
+                  compactMode={false}
+                />
+              </div>
+            </div>
+          </div>
+        </Popover.Content>
+      </Popover.Root>
+
+      {/* S Button (Stroke Color & Properties) */}
+      <Popover.Root open={strokeOpen} onOpenChange={setStrokeOpen}>
+        <Popover.Trigger asChild>
+          <button
+            type="button"
+            className="ColorButton"
+            title="Stroke & Properties (S)"
+            aria-label="Stroke & Properties"
+            style={{
+              width: "20px",
+              height: "16px",
+              fontSize: "10px",
+              fontWeight: "bold",
+              color: "#333",
+              backgroundColor: "#cee4c2ff", // Light pink/red background for Stroke button
+              border: "1px solid #ccc",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              padding: 0,
+            }}
+          >
+            S
+          </button>
+        </Popover.Trigger>
+        <Popover.Content
+          className="style-picker-popover excalidraw"
+          style={{
+            minWidth: "280px",
+            zIndex: 1200,
+          }}
+          align="start"
+          side="bottom"
+          avoidCollisions={true}
+          collisionPadding={10}
+        >
+          <div className="style-picker-container">
+            {/* Stroke Color */}
+            <div className="style-picker-section">
+              <label className="style-picker-label">Stroke Color</label>
+              <div className="color-controls">
+                <ColorPicker
+                  type="elementStroke"
+                  color={
+                    targetElements.length === 1
+                      ? targetElements[0]?.strokeColor ?? null
+                      : null
+                  }
+                  onChange={(color) => {
+                    onChange({
+                      currentItemStrokeColor: color,
+                    });
+                    setLastSelectedColorSource('stroke');
+                    setStrokeOpen(false);
+                  }}
+                  label="Stroke Color"
+                  elements={targetElements}
+                  appState={appState as any}
+                  updateData={(data) => {
+                    if (data.openPopup !== undefined) {
+                      onChange({ openPopup: data.openPopup } as any);
+                    }
+                  }}
+                  compactMode={false}
+                />
+              </div>
+            </div>
+
+            {/* Properties */}
+            <div className="style-picker-section">
+              <label className="style-picker-label">Properties</label>
+              <div
+                className="style-properties"
+                onClick={() => setStrokeOpen(false)} // CLOSE ON ANY PROPERTY CLICK
+              >
+                {renderAction("changeStrokeWidth")}
+                {renderAction("changeFillStyle")}
+                {renderAction("changeStrokeStyle")}
+                {renderAction("changeRoundness")}
+              </div>
+            </div>
+
+            {/* Text-specific */}
+            {appState.activeTool.type === "text" && (
+              <div className="style-picker-section">
+                <label className="style-picker-label">Text</label>
+                <div
+                  className="style-properties"
+                  onClick={() => setStrokeOpen(false)} // CLOSE ON ANY TEXT PROPERTY CLICK
+                >
+                  {renderAction("changeFontFamily")}
+                  {renderAction("changeFontSize")}
+                  {renderAction("changeTextAlign")}
+                </div>
+              </div>
+            )}
+          </div>
+        </Popover.Content>
+      </Popover.Root>
+    </div>
+  );
+};
+
+
+
+
+// BG Dropdown Component - Styled like other toolbar buttons with hover effects
+const BGDropdown = ({ appState, onChange, renderAction }: {
+  appState: UIAppState;
+  onChange: (updates: Partial<UIAppState>) => void;
+  renderAction: any;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
+      <Popover.Trigger asChild>
+        <button
+          type="button"
+          className="ToolIcon_type_button ToolIcon"
+          title="Canvas Background (BG)"
+          // aria-label="Canvas Background"
+          style={{
+            border: "none",
+            padding: 0,
+            backgroundColor: "initial",
+            fontSize: "inherit",
+            margin: 0,
+          }}
+        >
+          <div
+            className="ToolIcon__icon"
+            style={{
+              // backgroundColor: appState.viewBackgroundColor || "#ffffff",
+              background:"transparint",
+              color: "#333",
+              fontSize: "10px",
+              fontWeight: "bold",
+              width: "36px",
+              height: "36px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "relative",
+            }}
+            aria-disabled="false"
+          >
+            BG
+          </div>
+        </button>
+      </Popover.Trigger>
+      <Popover.Content
+        className="style-picker-popover excalidraw"
+        style={{
+          minWidth: "200px",
+          zIndex: 1200,
+        }}
+        align="start"
+        side="bottom"
+        avoidCollisions={true}
+        collisionPadding={10}
+        onClick={() => setIsOpen(false)}
+      >
+        <div className="style-picker-container">
+          <div className="style-picker-section">
+            <label className="style-picker-label">Canvas Background</label>
+            <div className="color-controls">
+              {renderAction("changeViewBackgroundColor")}
+            </div>
+          </div>
+        </div>
+      </Popover.Content>
+    </Popover.Root>
+  );
+};
+
+// Emjoies function
+
 export const ShapesSwitcher = ({
   activeTool,
   appState,
   app,
   UIOptions,
+  elementsMap,
+  setAppState,
+  onChange,
+  renderAction,
+  isCollaborating,
+  onShareDialogOpen,
+  renderTopRightUI,
 }: {
   activeTool: UIAppState["activeTool"];
   appState: UIAppState;
   app: AppClassProperties;
   UIOptions: AppProps["UIOptions"];
+  elementsMap: any;
+  setAppState: any;
+  onChange: any;
+  renderAction: any;
+  isCollaborating: boolean;
+  onShareDialogOpen?: () => void;
+  renderTopRightUI?: React.ComponentProps<any>["renderTopRightUI"];
 }) => {
-  const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
+    const [isShapesMenuOpen, setIsShapesMenuOpen] = useState(false);
+  const [isEmojiMenuOpen, setIsEmojiMenuOpen] = useState(false);
+  const [isFlowchartMenuOpen, setIsFlowchartMenuOpen] = useState(false);
+  const [isGraphMenuOpen, setIsGraphMenuOpen] = useState(false);
+  const [lastSelectedColorSource, setLastSelectedColorSource] = useState<'fill' | 'stroke'>('stroke');
+
+
 
   const frameToolSelected = activeTool.type === "frame";
-  const laserToolSelected = activeTool.type === "laser";
-  const lassoToolSelected =
-    activeTool.type === "lasso" && app.defaultSelectionTool !== "lasso";
+  // const laserToolSelected = activeTool.type === "laser";
+  // const lassoToolSelected =
+  //   activeTool.type === "lasso" && app.defaultSelectionTool !== "lasso";
 
   const embeddableToolSelected = activeTool.type === "embeddable";
 
+  // Check if any merged shape is currently active
+  const mergedShapesSelected = [
+    "rectangle",
+    "diamond",
+    "ellipse",
+    "arrow",
+    "line",
+  ].includes(activeTool.type);
+
   const { TTDDialogTriggerTunnel } = useTunnels();
+  const { container } = useExcalidrawContainer();
+  
+
+  const toolbarTools = getToolbarTools(app);
 
   return (
     <>
-      {getToolbarTools(app).map(
-        ({ value, icon, key, numericKey, fillable }, index) => {
+      <TTDDialogTriggerTunnel.In>
+      </TTDDialogTriggerTunnel.In>
+
+      {toolbarTools.map(
+        ({ value, icon, key, numericKey, fillable = false }, index) => {
+
           if (
             UIOptions.tools?.[
               value as Extract<
@@ -773,12 +1193,241 @@ export const ShapesSwitcher = ({
             return null;
           }
 
+// Handle canvas background tool
+          if (value === "canvasbackground") {
+            return (
+              <BGDropdown
+                key={value}
+                appState={appState}
+                onChange={onChange}
+                renderAction={renderAction}
+              />
+            );
+          }
+
+
+
+// Emojies Section
+
+
+// Emojies Section
+// ---------- Replace your existing Emoji dropdown with this block ----------
+if (value === "emoji") {
+  return (
+    <DropdownMenu open={isEmojiMenuOpen} key={value}>
+      <DropdownMenu.Trigger
+        className="ToolIcon"
+        onToggle={() => setIsEmojiMenuOpen(!isEmojiMenuOpen)}
+        title="Emojis"
+      >
+        <span className={"ToolIcon__keybinding"}>8</span>
+       <span style={{ filter: "grayscale(100%) brightness(1.1) contrast(1.2)" }}>
+    😊
+  </span>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content
+        onClickOutside={() => setIsEmojiMenuOpen(false)}
+        onSelect={() => setIsEmojiMenuOpen(false)}
+        className="App-toolbar__shapes-dropdown"
+        style={{ display: "flex", gap: "0.5rem", padding: "0.5rem" }}
+      >
+        {["❤️", "😂", "😢", "😎", "👍"].map((emoji) => (
+          <DropdownMenu.Item
+            key={emoji}
+            onSelect={() => {
+              // call the helper (it's async). we intentionally don't await here.
+              void insertEmoji(app, emoji);
+              setIsEmojiMenuOpen(false);
+            }}
+            style={{ fontSize: "1.5rem" }}
+          >
+            {emoji}
+          </DropdownMenu.Item>
+        ))}
+      </DropdownMenu.Content>
+    </DropdownMenu>
+  );
+}
+
+
+
+
+
+// ------------------------------------------------------------------------
+
+
+
+// FlowChart sEction
+
+
+
+
+if (value === "flowchart") {
+  return (
+    <DropdownMenu open={isFlowchartMenuOpen} key={value}>
+      <DropdownMenu.Trigger
+        className="ToolIcon"
+        onToggle={() => setIsFlowchartMenuOpen(!isFlowchartMenuOpen)}
+        title="Flowchart"
+      >
+        <span className="ToolIcon__keybinding">9</span>
+        
+         <span style={{ filter: "grayscale(100%) brightness(1.1) contrast(1.2)" }}>
+  📊
+</span>
+
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content>
+        <FlowchartDropdown
+          addElementsViaAction={(els: any[]) => {
+            // Get current elements using the correct method
+            const currentElements = app.scene.getNonDeletedElements();
+            const newElements = [...currentElements, ...els];
+            
+            // Replace all elements
+            app.scene.replaceAllElements(newElements);
+            
+            // Close the dropdown
+            setIsFlowchartMenuOpen(false);
+          }}
+        />
+      </DropdownMenu.Content>
+    </DropdownMenu>
+  );
+}
+
+
+// Graphs
+// FlowChart section (your existing code)
+
+
+
+
+          // Handle the style picker tool specially (with F/S buttons)
+          if (value === "stylepicker") {
+            return (
+              <div key={value} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                <ColorButtons
+                  appState={appState}
+                  onChange={onChange}
+                  container={container || document.body}
+                  elementsMap={elementsMap || new Map()}
+                  renderAction={renderAction}
+                  setLastSelectedColorSource={setLastSelectedColorSource}
+                />
+                <DynamicColorBox
+                  appState={appState}
+                  lastSelectedColorSource={lastSelectedColorSource || 'stroke'}
+                />
+                {renderTopRightUI?.(false, appState)}
+              </div>
+            );
+          }
+
+// color
+
+
+
+
+// FlowChart Working
+
+
+
+          // Handle the shapes dropdown specially
+          if (value === "shapes") {
+            return (
+              <DropdownMenu open={isShapesMenuOpen} key={value}>
+                <DropdownMenu.Trigger
+                  className={clsx("Shape", { fillable},"ToolIcon","ToolIcon--selected")}
+                  onToggle={() => setIsShapesMenuOpen(!isShapesMenuOpen)}
+                  title={t("toolBar.rectangle")}
+                                   
+                >
+                  <span className="ToolIcon__keybinding">7</span>
+                  {/* Show the icon of the currently active shape, or rectangle if none is active */}
+                  {mergedShapesSelected ? (
+                    activeTool.type === "rectangle" ? RectangleIcon :
+                    activeTool.type === "diamond" ? DiamondIcon :
+                    activeTool.type === "ellipse" ? EllipseIcon :
+                    activeTool.type === "arrow" ? ArrowIcon :
+                    activeTool.type === "line" ? LineIcon : RectangleIcon
+                  ) : RectangleIcon}
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content
+                  onClickOutside={() => setIsShapesMenuOpen(false)}
+                  onSelect={() => setIsShapesMenuOpen(false)}
+                  className="App-toolbar__shapes-dropdown"
+                >
+                  <DropdownMenu.Item
+                    onSelect={() => app.setActiveTool({ type: "rectangle" })}
+                    icon={RectangleIcon}
+                    shortcut={capitalizeString(KEYS.R)}
+                    data-testid="toolbar-rectangle"
+                    selected={activeTool.type === "rectangle"}
+                  >
+                    {t("toolBar.rectangle")}
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    onSelect={() => app.setActiveTool({ type: "diamond" })}
+                    icon={DiamondIcon}
+                    shortcut={capitalizeString(KEYS.D)}
+                    data-testid="toolbar-diamond"
+                    selected={activeTool.type === "diamond"}
+                  >
+                    {t("toolBar.diamond")}
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    onSelect={() => app.setActiveTool({ type: "ellipse" })}
+                    icon={EllipseIcon}
+                    shortcut={capitalizeString(KEYS.O)}
+                    data-testid="toolbar-ellipse"
+                    selected={activeTool.type === "ellipse"}
+                  >
+                    {t("toolBar.ellipse")}
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    onSelect={() => app.setActiveTool({ type: "arrow" })}
+                    icon={ArrowIcon}
+                    shortcut={capitalizeString(KEYS.A)}
+                    data-testid="toolbar-arrow"
+                    selected={activeTool.type === "arrow"}
+                  >
+                    {t("toolBar.arrow")}
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    onSelect={() => app.setActiveTool({ type: "line" })}
+                    icon={LineIcon}
+                    shortcut={capitalizeString(KEYS.L)}
+                    data-testid="toolbar-line"
+                    selected={activeTool.type === "line"}
+                  >
+                    {t("toolBar.line")}
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu>
+            );
+          }
+
+
+
           const label = t(`toolBar.${value}`);
           const letter =
             key && capitalizeString(typeof key === "string" ? key : key[0]);
           const shortcut = letter
-            ? `${letter} ${t("helpDialog.or")} ${numericKey}`
-            : `${numericKey}`;
+            ? `${letter} ${t("helpDialog.or")} ${
+                numericKey
+                  ? Array.isArray(numericKey)
+                    ? numericKey[0]
+                    : String(numericKey)
+                  : ""
+              }`
+            : `${
+                numericKey
+                  ? Array.isArray(numericKey)
+                    ? numericKey[0]
+                    : String(numericKey)
+                  : ""
+              }`;
 
           return (
             <ToolButton
@@ -789,7 +1438,11 @@ export const ShapesSwitcher = ({
               checked={activeTool.type === value}
               name="editor-current-shape"
               title={`${capitalizeString(label)} — ${shortcut}`}
-              keyBindingLabel={numericKey || letter}
+              keyBindingLabel={
+                (numericKey &&
+                  (Array.isArray(numericKey) ? numericKey[0] : numericKey)) ||
+                letter
+              }
               aria-label={capitalizeString(label)}
               aria-keyshortcuts={shortcut}
               data-testid={`toolbar-${value}`}
@@ -822,102 +1475,82 @@ export const ShapesSwitcher = ({
           );
         },
       )}
-      <div className="App-toolbar__divider" />
 
-      <DropdownMenu open={isExtraToolsMenuOpen}>
-        <DropdownMenu.Trigger
-          className={clsx("App-toolbar__extra-tools-trigger", {
-            "App-toolbar__extra-tools-trigger--selected":
-              frameToolSelected ||
-              embeddableToolSelected ||
-              lassoToolSelected ||
-              // in collab we're already highlighting the laser button
-              // outside toolbar, so let's not highlight extra-tools button
-              // on top of it
-              (laserToolSelected && !app.props.isCollaborating),
-          })}
-          onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
-          title={t("toolBar.extraTools")}
-        >
-          {frameToolSelected
-            ? frameToolIcon
-            : embeddableToolSelected
-            ? EmbedIcon
-            : laserToolSelected && !app.props.isCollaborating
-            ? laserPointerToolIcon
-            : lassoToolSelected
-            ? LassoIcon
-            : extraToolsIcon}
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content
-          onClickOutside={() => setIsExtraToolsMenuOpen(false)}
-          onSelect={() => setIsExtraToolsMenuOpen(false)}
-          className="App-toolbar__extra-tools-dropdown"
-        >
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "frame" })}
-            icon={frameToolIcon}
-            shortcut={KEYS.F.toLocaleUpperCase()}
-            data-testid="toolbar-frame"
-            selected={frameToolSelected}
-          >
-            {t("toolBar.frame")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "embeddable" })}
-            icon={EmbedIcon}
-            data-testid="toolbar-embeddable"
-            selected={embeddableToolSelected}
-          >
-            {t("toolBar.embeddable")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "laser" })}
-            icon={laserPointerToolIcon}
-            data-testid="toolbar-laser"
-            selected={laserToolSelected}
-            shortcut={KEYS.K.toLocaleUpperCase()}
-          >
-            {t("toolBar.laser")}
-          </DropdownMenu.Item>
-          {app.defaultSelectionTool !== "lasso" && (
-            <DropdownMenu.Item
-              onSelect={() => app.setActiveTool({ type: "lasso" })}
-              icon={LassoIcon}
-              data-testid="toolbar-lasso"
-              selected={lassoToolSelected}
-            >
-              {t("toolBar.lasso")}
-            </DropdownMenu.Item>
-          )}
-          <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
-            Generate
-          </div>
-          {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
-          <DropdownMenu.Item
-            onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
-            icon={mermaidLogoIcon}
-            data-testid="toolbar-embeddable"
-          >
-            {t("toolBar.mermaidToExcalidraw")}
-          </DropdownMenu.Item>
-          {app.props.aiEnabled !== false && app.plugins.diagramToCode && (
-            <>
-              <DropdownMenu.Item
-                onSelect={() => app.onMagicframeToolSelect()}
-                icon={MagicIcon}
-                data-testid="toolbar-magicframe"
-              >
-                {t("toolBar.magicframe")}
-                <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
-              </DropdownMenu.Item>
-            </>
-          )}
-        </DropdownMenu.Content>
-      </DropdownMenu>
+
+
+
+    
+
+
+
+
+
+      
     </>
   );
+
+// Color
+
+
+
+
+
+
+
+
 };
+
+
+
+
+
+
+
+
+// ---------- Add this helper function near the bottom of the file (before ZoomActions) ----------
+
+
+
+/**
+ * Insert an emoji into the canvas as a text element.
+ */
+async function insertEmoji(app: AppClassProperties, emoji: string) {
+  console.log("insertEmoji called with:", emoji);
+  
+  try {
+    // Generate random position to avoid overlapping
+    const randomX = 300 + Math.random() * 400; // Random between 200-600
+    const randomY = 50 + Math.random() * 300; // Random between 150-450
+    
+    // Or use a counter approach for consistent spacing
+    // You could also store a counter and increment it
+    
+    const textElement = newTextElement({
+      x: randomX,
+      y: randomY,
+      text: emoji,
+      fontSize: 48,
+      fontFamily: 1,
+      textAlign: "center",
+      verticalAlign: "middle",
+    });
+    
+    console.log("Created text element at:", randomX, randomY);
+
+    const currentElements = app.scene.getNonDeletedElements();
+    const newElements = [...currentElements, textElement];
+
+    app.scene.replaceAllElements(newElements);
+    
+    console.log("Scene updated successfully");
+
+  } catch (err) {
+    console.error("Failed to insert emoji:", err);
+  }
+}
+
+
+
 
 export const ZoomActions = ({
   renderAction,
@@ -951,6 +1584,8 @@ export const UndoRedoActions = ({
     </div>
   </div>
 );
+
+
 
 export const ExitZenModeAction = ({
   actionManager,

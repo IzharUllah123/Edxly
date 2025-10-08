@@ -76,6 +76,9 @@ export const MobileMenu = ({
     MainMenuTunnel,
     DefaultSidebarTriggerTunnel,
   } = useTunnels();
+
+  // Create elementsMap from elements array
+  const elementsMap = app.scene.getNonDeletedElementsMap();
   const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">
@@ -92,6 +95,11 @@ export const MobileMenu = ({
                       activeTool={appState.activeTool}
                       UIOptions={UIOptions}
                       app={app}
+                      elementsMap={elementsMap}
+                      setAppState={setAppState}
+                      onChange={() => {}}
+                      renderAction={actionManager.renderAction}
+                      isCollaborating={false}
                     />
                   </Stack.Row>
                 </Island>

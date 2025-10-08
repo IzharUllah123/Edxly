@@ -1,13 +1,16 @@
 @import "../../css/variables.module.scss";
 
 .excalidraw {
+  // --- Collab button base + variables ---
   .collab-button {
     --button-bg: var(--color-primary);
     --button-color: var(--color-surface-lowest);
     --button-border: var(--color-primary);
 
     --button-width: var(--lg-button-size);
+  
     --button-height: var(--lg-button-size);
+   
 
     --button-hover-bg: var(--color-primary-darker);
     --button-hover-border: var(--color-primary-darker);
@@ -15,35 +18,95 @@
     --button-active-bg: var(--color-primary-darker);
 
     box-shadow: 0 0 0 1px var(--color-surface-lowest);
-
     flex-shrink: 0;
 
-    // double .active to force specificity
+    // basic sizing / layout (keep if you already have them)
+    width: var(--button-width);
+    height: var(--button-height);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    border-radius: 8px;
+    border: 1px solid var(--button-border);
+    cursor: pointer;
+    background: linear-gradient(135deg, rgba(11,184,132,1) 0%, rgba(0,200,120,1) 100%);
+    color: var(--button-color);
+    transition: transform 160ms ease, box-shadow 200ms ease, filter 200ms ease, background 220ms ease, border-color 220ms ease, color 220ms ease;
+
+    // hover
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(11,184,132,0.16), 0 0 0 2px rgba(11,184,132,0.08);
+      background: linear-gradient(135deg, rgba(5,200,150,1) 0%, rgba(0,220,140,1) 100%);
+      border-color: rgba(0,180,110,0.9);
+    }
+
+    &:active {
+      transform: translateY(0px) scale(0.98);
+      box-shadow: 0 3px 10px rgba(11,184,132,0.12);
+    }
+
+    // double .active to force specificity (preserves your original selector)
     &.active.active {
-      background-color: #0fb884;
+      // replace solid color with lively gradient and make it stand out
+      background: linear-gradient(135deg, #05c896 0%, #0fb884 50%, #00b77a 100%);
       border-color: #0fb884;
+      color: #ffffff;
+      filter: saturate(1.06);
 
       svg {
         color: #fff;
       }
 
+      // keep hover/active consistent when active
       &:hover,
       &:active {
-        background-color: #0fb884;
-        border-color: #0fb884;
+        background: linear-gradient(135deg, #04b887 0%, #0fa776 50%, #00a866 100%);
+        border-color: #0fa776;
+        transform: translateY(-1px);
       }
+
+      // subtle glow animation while actively collaborating
+      &.is-animating {
+        animation: collabPulse 2000ms infinite;
+      }
+    }
+
+    // Respect reduced motion preferences
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+      animation: none;
     }
   }
 
+  // --- animated green for "is-collaborating" variant ---
   .CollabButton.is-collaborating {
-    background-color: var(--button-special-active-bg-color);
+    // use a specialized CSS variable if set elsewhere; otherwise fallback to green gradient
+    // background: linear-gradient(135deg, var(--button-special-active-bg-color, #05c896) 0%, #0fb884 60%);
+    border-color: rgba(11,184,132,0.9);
+    background: yellow;
+    color: #fff;
+    box-shadow: 0 8px 30px rgba(11,184,132,0.14);
+
+    // breathing glow for collaborators
+    &.active,
+    &.is-collaborating {
+      // only apply animation class if you want continuous pulse:
+      animation: collabPulse 2200ms infinite;
+    }
 
     .ToolIcon__icon svg,
     .ToolIcon__label {
-      color: var(--icon-green-fill-color);
+      color: var(--icon-green-fill-color, #fff);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
     }
   }
 
+  // --- collaborators badge (keep your original placement but updated colors) ---
   .CollabButton-collaborators {
     :root[dir="ltr"] & {
       right: -5px;
@@ -58,9 +121,30 @@
     bottom: -5px;
     padding: 3px;
     border-radius: 50%;
-    background-color: $oc-green-2;
+    background: linear-gradient(180deg, $oc-green-2 0%, darken($oc-green-2, 6%) 100%);
     color: $oc-green-9;
     font-size: 0.6rem;
     font-family: "Cascadia";
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  }
+
+  // --- keyframes for pulsing glow ---
+  @keyframes collabPulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(11,184,132,0.16), 0 0 0 0 rgba(11,184,132,0.04);
+      transform: translateY(0) scale(1);
+      filter: saturate(1);
+    }
+    50% {
+      box-shadow: 0 10px 30px rgba(11,184,132,0.12), 0 0 30px rgba(11,184,132,0.06);
+      transform: translateY(-2px) scale(1.01);
+      filter: saturate(1.08);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(11,184,132,0.16), 0 0 0 0 rgba(11,184,132,0.04);
+      transform: translateY(0) scale(1);
+      filter: saturate(1);
+    }
   }
 }

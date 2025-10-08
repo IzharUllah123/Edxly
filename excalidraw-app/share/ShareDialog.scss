@@ -94,29 +94,54 @@
         font-size: 1.3125rem;
         line-height: 130%;
 
-        color: var(--color-primary);
+        color: #0fb884; // green instead of purple
       }
 
       &__description {
         font-weight: 400;
         font-size: 0.875rem;
         line-height: 150%;
-
         text-align: center;
-
         color: var(--text-primary-color);
 
         & strong {
           display: block;
           font-weight: 700;
+          color: #0fb884; // bold text now green
         }
       }
 
       &__button {
         display: flex;
-
         align-items: center;
         justify-content: center;
+
+        // wrapper style
+        background: #0fb884;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+
+        // actual button element inside
+        button {
+          background: #0fb884 !important;
+          border: 1px solid #0aa46e !important;
+          color: #fff !important;
+          font-weight: 600;
+          border-radius: 0.5rem;
+          padding: 0.5rem 1rem;
+          cursor: pointer;
+          transition: background 0.2s ease, transform 0.15s ease;
+
+          &:hover {
+            background: #0aa46e !important;
+            transform: translateY(-1px);
+          }
+
+          &:active {
+            background: #099260 !important;
+            transform: translateY(0);
+          }
+        }
       }
     }
 

@@ -3,6 +3,37 @@
 
 .excalidraw {
   .App-toolbar {
+    /* Animated gradient background that changes slowly over time */
+    background: linear-gradient(
+     90deg, 
+    #7ee087 0%, 
+    #00bfff 30%, 
+    #00e0c6 65%, 
+    #2af598 100%
+    );
+    background-size: 400% 400%;
+    animation: gradient-shift 40s ease-in-out infinite;
+
+    @keyframes gradient-shift {
+      0% {
+        background-position: 0% 50%;
+      }
+      25% {
+        background-position: 100% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      75% {
+        background-position: 0% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
     &.zen-mode {
       .ToolIcon__keybinding,
       .HintViewer {
@@ -32,6 +63,29 @@
       }
     }
   }
+  .ToolIcon{
+    background-color: transparent;
+    border-color: transparent;
+  }
+  .ToolIcon2{
+    background-color: black;
+  }
+ 
+  .theme--dark .App-toolbar {
+    /* Dark mode animated gradient background that changes slowly over time */
+    background: linear-gradient(
+      -45deg,
+      #4a90e2,
+      #357abd,
+      #2c5aa0,
+      #1e3a8a,
+      #1e40af,
+      #2563eb
+    );
+    background-size: 400% 400%;
+    animation: gradient-shift 15s ease-in-out infinite;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
 
   .App-toolbar__extra-tools-trigger {
     box-shadow: none;
@@ -57,4 +111,81 @@
     min-width: 11.875rem;
     z-index: 1;
   }
+
+  
+
+  /* EDXLY Branding Styling */
+  .EdxlyBranding-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    border-radius: var(--border-radius-md);
+    background: linear-gradient(135deg, #4158d0, #c850c0, #ffcc70);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    user-select: none;
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: -0.25rem;
+      bottom: 0;
+      width: 1px;
+      background: var(--default-border-color);
+    }
+  }
+
+  .theme--dark .EdxlyBranding-container {
+    background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #f5576c);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}
+
+// Code For EDXLy
+
+/* Toolbar styling */
+.txt {
+  display: flex;
+  align-items: center; /* vertically center */
+  justify-content: center; /* horizontally center */
+  // height: 60px;
+  // background: linear-gradient(90deg, #e67417, #d4c68e);
+  color: white;
+  font-size: 17px;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+   padding: 5px;
+}
+
+/* Optional: style the text */
+.toolbar .edxly {
+  letter-spacing: 2px;
+ 
+}
+
+
+
+// pen
+
+.style-picker-popover {
+  z-index: 1200; /* ensure the popover itself sits above other UI */
+}
+
+.color-controls {
+  position: relative; /* ensures any absolute-positioned picker inside is anchored */
+}
+
+/* if ColorPicker renders a popup with class .colorpicker-popup (adjust to your implementation) */
+.colorpicker-popup {
+  z-index: 1300 !important;
 }

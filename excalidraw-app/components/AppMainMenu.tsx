@@ -37,7 +37,6 @@ export const AppMainMenu: React.FC<{
       )}
       <MainMenu.DefaultItems.CommandPalette className="highlighted" />
       <MainMenu.DefaultItems.SearchMenu />
-      <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
       <MainMenu.ItemLink
@@ -85,7 +84,6 @@ export const AppMainMenu: React.FC<{
       <MainMenu.ItemCustom>
         <LanguageList style={{ width: "100%" }} />
       </MainMenu.ItemCustom>
-      <MainMenu.DefaultItems.ChangeCanvasBackground />
     </MainMenu>
   );
 });

@@ -17,6 +17,10 @@ export default defineConfig(({ mode }) => {
       port: Number(envVars.VITE_APP_PORT || 3000),
       // open the browser
       open: true,
+       fs: {
+      strict: false,
+    },
+      
     },
     // We need to specify the envDir since now there are no
     //more located in parallel with the vite.config.ts file but in parent dir
@@ -124,7 +128,7 @@ export default defineConfig(({ mode }) => {
         eslint:
           envVars.VITE_APP_ENABLE_ESLINT === "false"
             ? undefined
-            : { lintCommand: 'eslint "./**/*.{js,ts,tsx}"' },
+            : { lintCommand: 'eslint "components/**/*.{js,ts,tsx}" "data/**/*.{js,ts,tsx}" "collab/**/*.{js,ts,tsx}" "app-language/**/*.{js,ts,tsx}" "*.{js,ts,tsx}"' },
         overlay: {
           initialIsOpen: envVars.VITE_APP_COLLAPSE_OVERLAY === "false",
           badgeStyle: "margin-bottom: 4rem; margin-left: 1rem",

@@ -1,73 +1,32 @@
-.excalidraw {
-  .ExcalidrawLogo {
-    --logo-icon--xs: 2rem;
-    --logo-text--xs: 1.5rem;
+.ExcalidrawLogo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
-    --logo-icon--small: 2.5rem;
-    --logo-text--small: 1.75rem;
+  &-icon {
+    font-size: 4rem; // adjust size as needed
+  }
 
-    --logo-icon--normal: 3rem;
-    --logo-text--normal: 2.2rem;
-
-    --logo-icon--large: 90px;
-    --logo-text--large: 65px;
-
-    display: flex;
-    align-items: center;
-
-    svg {
-      flex: 0 0 auto;
-    }
-
-    .ExcalidrawLogo-icon {
-      width: auto;
-      color: var(--color-logo-icon);
-    }
-
-    .ExcalidrawLogo-text {
-      margin-left: 0.75rem;
-      width: auto;
-      color: var(--color-logo-text);
-    }
-
-    &.is-xs {
-      .ExcalidrawLogo-icon {
-        height: var(--logo-icon--xs);
+  &-text {
+    font-family: Verdana, sans-serif;
+    font-weight: bold;
+    font-size: 3rem; // adjust relative to icon
       }
 
-      .ExcalidrawLogo-text {
-        height: var(--logo-text--xs);
-      }
-    }
-
-    &.is-small {
-      .ExcalidrawLogo-icon {
-        height: var(--logo-icon--small);
-      }
-
-      .ExcalidrawLogo-text {
-        height: var(--logo-text--small);
-      }
-    }
-
-    &.is-normal {
-      .ExcalidrawLogo-icon {
-        height: var(--logo-icon--normal);
-      }
-
-      .ExcalidrawLogo-text {
-        height: var(--logo-text--normal);
-      }
-    }
-
-    &.is-large {
-      .ExcalidrawLogo-icon {
-        height: var(--logo-icon--large);
-      }
-
-      .ExcalidrawLogo-text {
-        height: var(--logo-text--large);
-      }
-    }
+  .gradient-text {
+    background: linear-gradient(
+      90deg,
+    
+      #7ee087 0%, 
+      #00bfff 30%, 
+      #00e0c6 65%, 
+      #2af598 100%
+      // #d4c68e 100%
+    ); // change gradient colors here
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
   }
 }
+

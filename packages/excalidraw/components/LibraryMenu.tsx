@@ -157,9 +157,6 @@ const LibraryMenuContent = memo(
           <LibraryMenuControlButtons
             className="library-menu-control-buttons--at-bottom"
             style={{ padding: "16px 12px 0 12px" }}
-            id={id}
-            libraryReturnUrl={libraryReturnUrl}
-            theme={theme}
           />
         )}
       </LibraryMenuWrapper>
@@ -258,41 +255,48 @@ const usePendingElementsMemo = (
  */
 export const LibraryMenu = memo(() => {
   const app = useApp();
-  const { onInsertElements } = app;
   const appProps = useAppProps();
-  const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
+  const appState = useUIAppState();
+
   const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
-  const memoizedLibrary = useMemo(() => app.library, [app.library]);
+
   const pendingElements = usePendingElementsMemo(appState, app);
 
   const onInsertLibraryItems = useCallback(
-    (libraryItems: LibraryItems) => {
-      onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
+    (libraryItem: LibraryItems) => {
+      app.addElementsFromPasteOrLibrary({
+        elements: distributeLibraryItemsOnSquareGrid(libraryItem),
+        position: "center",
+        files: null,
+      });
     },
-    [onInsertElements],
+    [app],
   );
 
-  const deselectItems = useCallback(() => {
-    setAppState({
-      selectedElementIds: {},
-      selectedGroupIds: {},
-      activeEmbeddable: null,
-    });
-  }, [setAppState]);
+  const onAddToLibrary = useCallback(() => {
+    app.setActiveTool({ type: "selection" });
+  }, [app]);
+
+  const onSelectItems = useCallback(
+    (items: LibraryItem["id"][]) => {
+      setSelectedItems(items);
+    },
+    [setSelectedItems],
+  );
 
   return (
     <LibraryMenuContent
-      pendingElements={pendingElements}
       onInsertLibraryItems={onInsertLibraryItems}
-      onAddToLibrary={deselectItems}
+      pendingElements={pendingElements}
+      onAddToLibrary={onAddToLibrary}
       setAppState={setAppState}
       libraryReturnUrl={appProps.libraryReturnUrl}
-      library={memoizedLibrary}
+      library={app.library}
       id={app.id}
       theme={appState.theme}
       selectedItems={selectedItems}
-      onSelectItems={setSelectedItems}
+      onSelectItems={onSelectItems}
     />
   );
 });

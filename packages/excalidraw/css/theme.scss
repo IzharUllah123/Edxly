@@ -20,7 +20,8 @@
   --input-hover-bg-color: #{$oc-gray-1};
   --input-label-color: #{$oc-gray-7};
   --island-bg-color: #ffffff;
-  --keybinding-color: var(--color-gray-40);
+  // --keybinding-color: var(--color-green-40);
+  --keybinding-color: rgb(0, 0, 0);
   --link-color: #{$oc-blue-7};
   --overlay-bg-color: #{transparentize($oc-white, 0.12)};
   --popup-bg-color: var(--island-bg-color);

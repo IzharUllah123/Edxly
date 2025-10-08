@@ -445,7 +445,7 @@ describe("Test Linear Elements", () => {
     });
 
     it("should update all the midpoints when element position changed", async () => {
-      const elementsMap = arrayToMap(h.elements);
+      const elementsMap = arrayToMap(h.elements) as any;
 
       createThreePointerLinearElement("line", {
         type: ROUNDNESS.PROPORTIONAL_RADIUS,
@@ -457,7 +457,7 @@ describe("Test Linear Elements", () => {
 
       const points = LinearElementEditor.getPointsGlobalCoordinates(
         line,
-        elementsMap,
+        elementsMap as any,
       );
       expect([line.x, line.y]).toEqual(points[0]);
 
@@ -584,7 +584,7 @@ describe("Test Linear Elements", () => {
         const elementsMap = arrayToMap(h.elements);
         const points = LinearElementEditor.getPointsGlobalCoordinates(
           line,
-          elementsMap,
+          elementsMap as any,
         );
         const midPoints = LinearElementEditor.getEditorMidPoints(
           line,
@@ -604,7 +604,7 @@ describe("Test Linear Elements", () => {
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(
           line,
-          elementsMap,
+          elementsMap as any,
         );
         expect([newPoints[0][0], newPoints[0][1]]).toEqual([
           points[0][0] - delta,
@@ -667,7 +667,7 @@ describe("Test Linear Elements", () => {
         enterLineEditingMode(line);
         const points = LinearElementEditor.getPointsGlobalCoordinates(
           line,
-          arrayToMap(h.elements),
+          arrayToMap(h.elements) as any,
         );
 
         // dragging line from last segment midpoint
@@ -981,7 +981,7 @@ describe("Test Linear Elements", () => {
       };
 
       const elements: ExcalidrawElement[] = [];
-      h.elements.forEach((element) => {
+      h.elements.forEach((element: any) => {
         if (element.id === container.id) {
           elements.push(container);
         } else {

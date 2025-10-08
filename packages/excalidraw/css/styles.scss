@@ -466,18 +466,18 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .help-icon {
-    @include outlineButtonStyles;
-    @include filledButtonOnCanvas;
+  // .help-icon {
+  //   @include outlineButtonStyles;
+  //   @include filledButtonOnCanvas;
 
-    width: var(--lg-button-size);
-    height: var(--lg-button-size);
+  //   width: var(--lg-button-size);
+  //   height: var(--lg-button-size);
 
-    svg {
-      width: var(--lg-icon-size);
-      height: var(--lg-icon-size);
-    }
-  }
+  //   svg {
+  //     width: var(--lg-icon-size);
+  //     height: var(--lg-icon-size);
+  //   }
+  // }
 
   .reset-zoom-button {
     font-family: var(--ui-font);
